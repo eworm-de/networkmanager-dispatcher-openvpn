@@ -3,6 +3,13 @@
 INTERFACE="${1}"
 STATUS="${2}"
 
+# VPN interfaces managed by networkmanager send events vpn-{up,down}.
+# If the connection is started by whatever networkmanager sees this
+# and triggers event up or down. Ignore these.
+if ! ip tuntap | grep -q "^${INTERFACE}:"; then
+	exit 0
+fi
+
 if [ "${STATUS}" == "up" ]; then
 	if pgrep -x openvpn >/dev/null; then
 		kill -USR1 $(pgrep -x openvpn)
